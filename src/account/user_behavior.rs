@@ -5,13 +5,13 @@ use crate::{
     BASE_URL,
     account::{
         Account, Error,
-        dtos::{FieldTypes, MessageCountVO, UserDetailVO},
+        dtos::{AccountLoginVO, FieldTypes, MessageCountVO, UserDetailVO},
     },
 };
 
 pub trait UserBehaviors {
     async fn patch_user_detail(
-        &self,
+        &mut self,
         nickname: Option<&str>,
         fullname: Option<&str>,
         description: Option<&str>,
@@ -26,7 +26,7 @@ pub trait UserBehaviors {
 
 impl UserBehaviors for Account {
     async fn patch_user_detail(
-        &self,
+        &mut self,
         nickname: Option<&str>,
         fullname: Option<&str>,
         description: Option<&str>,
@@ -74,6 +74,22 @@ impl UserBehaviors for Account {
             resp.status(),
             resp.headers()
         );
+        //刷新Token
+        let mut reqbody = HashMap::new();
+        reqbody.insert("pid", "65edCTyg");
+        reqbody.insert("identity", &self.username);
+        reqbody.insert("password", &self.password);
+        let token = self
+            .client
+            .post(format!("{}tiger/v3/web/accounts/login", BASE_URL))
+            .json(&reqbody)
+            .send()
+            .await?
+            .json::<AccountLoginVO>()
+            .await?
+            .auth
+            .token;
+        self.token = token;
         Ok(())
     }
 
