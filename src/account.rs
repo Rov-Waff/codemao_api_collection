@@ -1,13 +1,13 @@
-use std::{collections::HashMap, time::Duration};
-use dtos::{AccountLoginVO};
+use dtos::AccountLoginVO;
 use reqwest::Client;
+use std::{collections::HashMap, time::Duration};
 
 use thiserror::Error;
 
 use crate::BASE_URL;
 
-mod user_behavior;
 mod dtos;
+mod user_behavior;
 
 #[derive(Debug)]
 pub struct Account {
@@ -68,5 +68,26 @@ mod test {
         let password = env::var("PASSWORD").expect("env PASSWORD not found");
         let account = Account::new(&username, &password).await.expect("Fail!");
         println!("{:?}", &account);
+    }
+    use user_behavior::UserBehaviors;
+    #[tokio::test]
+    async fn test_patch_userinfo() {
+        env_logger::init();
+        dotenv().ok();
+        let username = env::var("USERNAME").expect("env USERNAME not found");
+        let password = env::var("PASSWORD").expect("env PASSWORD not found");
+        let account = Account::new(&username, &password).await.expect("Fail!");
+        println!("{:?}", &account);
+        account
+            .patch_user_detail(
+                Some("xiaole436t"),
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+            .await
+            .unwrap();
     }
 }
