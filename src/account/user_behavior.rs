@@ -22,7 +22,7 @@ pub trait UserBehaviors {
     async fn patch_user_password(&self, old_password: &str, password: &str) -> Result<(), Error>;
     async fn get_message_count(&self) -> Result<MessageCountVO, Error>;
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error>;
-    async fn update_token(&mut self) -> Result<(),Error>;
+    async fn update_token(&mut self) -> Result<(), Error>;
 }
 
 impl UserBehaviors for Account {
@@ -75,12 +75,21 @@ impl UserBehaviors for Account {
             resp.status(),
             resp.headers()
         );
-        
+
         Ok(())
     }
 
     async fn patch_user_password(&self, old_password: &str, password: &str) -> Result<(), Error> {
-        todo!()
+        let mut json_body = HashMap::new();
+        json_body.insert("old_password", old_password);
+        json_body.insert("password", password);
+        json_body.insert("confirm_password", password);
+        self.client
+            .patch(format!("{}tiger/v3/web/accounts/password", BASE_URL))
+            .json(&json_body)
+            .send()
+            .await?;
+        Ok(())
     }
 
     async fn get_message_count(&self) -> Result<MessageCountVO, Error> {
@@ -90,8 +99,8 @@ impl UserBehaviors for Account {
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error> {
         todo!()
     }
-    
-    async fn update_token(&mut self) -> Result<(),Error> {
+
+    async fn update_token(&mut self) -> Result<(), Error> {
         //刷新Token
         let mut reqbody = HashMap::new();
         reqbody.insert("pid", "65edCTyg");

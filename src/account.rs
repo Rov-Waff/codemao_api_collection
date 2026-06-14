@@ -76,7 +76,7 @@ mod test {
         dotenv().ok();
         let username = env::var("USERNAME").expect("env USERNAME not found");
         let password = env::var("PASSWORD").expect("env PASSWORD not found");
-        let account = Account::new(&username, &password).await.expect("Fail!");
+        let mut account = Account::new(&username, &password).await.expect("Fail!");
         println!("{:?}", &account);
         account
             .patch_user_detail(
