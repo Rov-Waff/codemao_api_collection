@@ -84,11 +84,16 @@ impl UserBehaviors for Account {
         json_body.insert("old_password", old_password);
         json_body.insert("password", password);
         json_body.insert("confirm_password", password);
-        self.client
+        let text = self.client
             .patch(format!("{}tiger/v3/web/accounts/password", BASE_URL))
+            .header("Cookie", format!("authorization={}", self.token))
             .json(&json_body)
             .send()
-            .await?;
+            .await?
+            .text()
+            .await?
+            ;
+        dbg!("Patched user password TEXT :{}",text);
         Ok(())
     }
 

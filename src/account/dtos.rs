@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]
+#[serde(untagged)]  
+#[warn(unused,dead_code)]
 pub enum FieldTypes {
     Int(i64),
     String(String)
@@ -17,12 +18,14 @@ pub struct AccountLoginVOAuth {
     pub token: String,
 }
 
-#[derive()]
+#[derive(Serialize,Deserialize,Debug)]
+#[warn(unused,dead_code)]
 pub struct MessageCountVO {
     pub query_type: String,
     pub count: i32,
 }
-
+#[derive(Serialize,Deserialize,Debug)]
+#[warn(unused,dead_code)]
 pub struct UserDetailVO {
     pub id: i32,
     pub nickname: String,
