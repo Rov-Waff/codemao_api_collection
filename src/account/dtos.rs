@@ -27,7 +27,7 @@ pub struct MessageCountVO {
 #[derive(Serialize,Deserialize,Debug)]
 #[warn(unused,dead_code)]
 pub struct UserDetailVO {
-    pub id: i32,
+    pub id: String,
     pub nickname: String,
     pub avatar_url: String,
     pub email: String,

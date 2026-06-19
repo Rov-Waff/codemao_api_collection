@@ -110,7 +110,16 @@ impl UserBehaviors for Account {
     }
 
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error> {
-        todo!()
+        let res = self
+            .client
+            .get(format!("{}web/users/details", BASE_URL))
+            .header("Cookie", format!("authorization={}", self.token))
+            .send()
+            .await?
+            .json::<UserDetailVO>()
+            .await?;
+        info!("Get user detail successful! CONTENT:{:?}",res);
+        Ok(res)
     }
 
     async fn update_token(&mut self) -> Result<(), Error> {

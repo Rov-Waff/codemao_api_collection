@@ -116,4 +116,14 @@ mod test {
             },
         }
     }
+    #[tokio::test]
+    async fn test_get_user_detail(){
+        dotenv().ok();
+        env_logger::init();
+        let username = env::var("USERNAME").expect("env USERNAME not found");
+        let password = env::var("PASSWORD").expect("env PASSWORD not found");
+        let account = Account::new(&username, &password).await.expect("Fail!");
+        let res = account.get_user_detail().await.unwrap();
+        println!("{:?}",res);
+    }
 }
