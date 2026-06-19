@@ -20,7 +20,7 @@ pub trait UserBehaviors {
         avatar_url: Option<&str>,
     ) -> Result<(), Error>;
     async fn patch_user_password(&self, old_password: &str, password: &str) -> Result<(), Error>;
-    async fn get_message_count(&self) -> Result<MessageCountVO, Error>;
+    async fn get_message_count(&self) -> Result<Vec<MessageCountVO>, Error>;
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error>;
     async fn update_token(&mut self) -> Result<(), Error>;
 }
@@ -84,21 +84,29 @@ impl UserBehaviors for Account {
         json_body.insert("old_password", old_password);
         json_body.insert("password", password);
         json_body.insert("confirm_password", password);
-        let text = self.client
+        let text = self
+            .client
             .patch(format!("{}tiger/v3/web/accounts/password", BASE_URL))
             .header("Cookie", format!("authorization={}", self.token))
             .json(&json_body)
             .send()
             .await?
             .text()
-            .await?
-            ;
-        dbg!("Patched user password TEXT :{}",text);
+            .await?;
+        dbg!("Patched user password TEXT :{}", text);
         Ok(())
     }
 
-    async fn get_message_count(&self) -> Result<MessageCountVO, Error> {
-        todo!()
+    async fn get_message_count(&self) -> Result<Vec<MessageCountVO>, Error> {
+        let mess = self
+            .client
+            .get(format!("{}web/message-record/count", BASE_URL))
+            .header("Cookie", format!("authorization={}", self.token))
+            .send()
+            .await?
+            .json::<Vec<MessageCountVO>>()
+            .await?;
+        Ok(mess)
     }
 
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error> {
