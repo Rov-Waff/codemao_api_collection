@@ -10,6 +10,7 @@ mod dtos;
 mod user_behavior;
 
 #[derive(Debug)]
+#[allow(dead_code)]
 pub struct Account {
     username: String,
     password: String,

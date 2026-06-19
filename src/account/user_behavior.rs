@@ -9,6 +9,7 @@ use crate::{
     },
 };
 
+#[allow(dead_code)]
 pub trait UserBehaviors {
     async fn patch_user_detail(
         &mut self,

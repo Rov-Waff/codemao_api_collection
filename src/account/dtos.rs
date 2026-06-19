@@ -1,11 +1,11 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-#[serde(untagged)]  
-#[warn(unused,dead_code)]
+#[serde(untagged)]
+#[allow(dead_code)]
 pub enum FieldTypes {
     Int(i64),
-    String(String)
+    String(String),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -18,14 +18,14 @@ pub struct AccountLoginVOAuth {
     pub token: String,
 }
 
-#[derive(Serialize,Deserialize,Debug)]
-#[warn(unused,dead_code)]
+#[derive(Serialize, Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct MessageCountVO {
     pub query_type: String,
     pub count: i32,
 }
-#[derive(Serialize,Deserialize,Debug)]
-#[warn(unused,dead_code)]
+#[derive(Serialize, Deserialize, Debug)]
+#[allow(dead_code)]
 pub struct UserDetailVO {
     pub id: String,
     pub nickname: String,
