@@ -5,7 +5,10 @@ use crate::{
     BASE_URL,
     account::{
         Account, Error,
-        dtos::{AccountLoginVO, FieldTypes, MessageCountVO, UserDetailVO},
+        dtos::{
+            AccountLoginVO, FieldTypes, MessageCountVO,
+            OtherUserDetailVO, UserDetailVO, Wrapper,
+        },
     },
 };
 
@@ -24,6 +27,7 @@ pub trait UserBehaviors {
     async fn get_message_count(&self) -> Result<Vec<MessageCountVO>, Error>;
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error>;
     async fn update_token(&mut self) -> Result<(), Error>;
+    async fn get_other_user_detail(&self,id:i32) -> Result<OtherUserDetailVO, Error>;
 }
 
 impl UserBehaviors for Account {
@@ -119,7 +123,7 @@ impl UserBehaviors for Account {
             .await?
             .json::<UserDetailVO>()
             .await?;
-        info!("Get user detail successful! CONTENT:{:?}",res);
+        info!("Get user detail successful! CONTENT:{:?}", res);
         Ok(res)
     }
 
@@ -141,5 +145,19 @@ impl UserBehaviors for Account {
             .token;
         self.token = token;
         Ok(())
+    }
+
+    async fn get_other_user_detail(
+        &self,
+        id: i32,
+    ) -> Result<OtherUserDetailVO, Error> {
+        Ok(self
+            .client
+            .get(format!("{}api/user/info/detail/{}", BASE_URL, id))
+            .send()
+            .await?
+            .json::<Wrapper<OtherUserDetailVO>>()
+            .await?
+            .data)
     }
 }

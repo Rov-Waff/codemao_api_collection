@@ -127,4 +127,14 @@ mod test {
         let res = account.get_user_detail().await.unwrap();
         println!("{:?}",res);
     }
+    #[tokio::test]
+    async fn test_get_other_user_detail(){
+        dotenv().ok();
+        env_logger::init();
+        let username = env::var("USERNAME").expect("env USERNAME not found");
+        let password = env::var("PASSWORD").expect("env PASSWORD not found");
+        let account = Account::new(&username, &password).await.expect("Fail!");
+        let res = account.get_other_user_detail(2615505).await.unwrap();
+        info!("{:?}",res);
+    }
 }

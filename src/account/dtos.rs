@@ -48,5 +48,40 @@ pub struct UserDetailVO {
     pub has_seen_primary_course: i32,
     pub author_level: i32,
 }
-
-
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Wrapper<T> {
+    pub code: i32,
+    pub msg: String,
+    pub description: String,
+    pub data: T,
+}
+#[derive(Serialize, Deserialize, Debug)]
+pub struct UserFieldInOtherUserDetailUserInfoField {
+    pub id: i32,
+    pub nickname: String,
+    pub sex: i32,
+    pub description: String,
+    pub doing: String,
+    pub level: i32,
+    pub avatar: String,
+}
+#[derive(Serialize, Deserialize, Debug)]
+#[allow(non_snake_case)]
+pub struct OtherUserDetailUserInfoFieldVO {
+    pub user: UserFieldInOtherUserDetailUserInfoField,
+    #[allow(nonstandard_style, non_snake_case)]
+    pub collectionTimes: i32,
+    #[allow(nonstandard_style, non_snake_case)]
+    pub forkedTimes: i32,
+    #[allow(nonstandard_style, non_snake_case)]
+    pub praiseTimes: i32,
+    #[allow(nonstandard_style, non_snake_case)]
+    pub viewTimes: i32,
+}
+#[derive(Serialize, Deserialize, Debug)]
+#[allow(non_snake_case)]
+pub struct OtherUserDetailVO {
+    #[allow(nonstandard_style, non_snake_case)]
+    pub userInfo: OtherUserDetailUserInfoFieldVO,
+    
+}
