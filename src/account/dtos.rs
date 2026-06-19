@@ -85,3 +85,27 @@ pub struct OtherUserDetailVO {
     pub userInfo: OtherUserDetailUserInfoFieldVO,
     
 }
+#[derive(Debug,Deserialize,Serialize,Default)]
+pub struct UserHonorInfoVO{
+    pub user_id:i32,
+    pub nickname:String,
+    pub avatar_url:String,
+    pub user_description:String,
+    pub doing:String,
+    pub attention_status:bool,
+    pub block_total:i32,
+    pub re_created_total:i32,
+    pub attention_total:i32,
+    pub fans_total:i32,
+    pub collected_total:i32,
+    pub liked_total:i32,
+    pub view_times:i32,
+    pub author_level:i32,
+    pub is_official_certification:i32,
+    pub subject_id:i32,
+    pub work_shop_name:String,
+    pub work_shop_level:i32,
+    pub like_score:i32,
+    pub collect_score:i32,
+    pub fork_score:i32
+}

@@ -58,10 +58,10 @@ impl Account {
 
 #[cfg(test)]
 mod test {
-    use std::env;
-    use log::info;
     use super::*;
     use dotenvy::dotenv;
+    use log::info;
+    use std::env;
     #[tokio::test]
     async fn test_login() {
         dotenv().ok();
@@ -118,23 +118,34 @@ mod test {
         }
     }
     #[tokio::test]
-    async fn test_get_user_detail(){
+    async fn test_get_user_detail() {
         dotenv().ok();
         env_logger::init();
         let username = env::var("USERNAME").expect("env USERNAME not found");
         let password = env::var("PASSWORD").expect("env PASSWORD not found");
         let account = Account::new(&username, &password).await.expect("Fail!");
         let res = account.get_user_detail().await.unwrap();
-        println!("{:?}",res);
+        println!("{:?}", res);
     }
     #[tokio::test]
-    async fn test_get_other_user_detail(){
+    async fn test_get_other_user_detail() {
         dotenv().ok();
         env_logger::init();
         let username = env::var("USERNAME").expect("env USERNAME not found");
         let password = env::var("PASSWORD").expect("env PASSWORD not found");
         let account = Account::new(&username, &password).await.expect("Fail!");
         let res = account.get_other_user_detail(2615505).await.unwrap();
+        info!("{:?}", res);
+    }
+
+    #[tokio::test]
+    async fn test_get_user_honor() {
+        dotenv().ok();
+        env_logger::init();
+        let username = env::var("USERNAME").expect("env USERNAME not found");
+        let password = env::var("PASSWORD").expect("env PASSWORD not found");
+        let account = Account::new(&username, &password).await.expect("Fail!");
+        let res = account.get_user_honor(2615505).await.unwrap();
         info!("{:?}",res);
     }
 }

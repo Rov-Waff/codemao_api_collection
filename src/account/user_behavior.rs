@@ -6,8 +6,8 @@ use crate::{
     account::{
         Account, Error,
         dtos::{
-            AccountLoginVO, FieldTypes, MessageCountVO,
-            OtherUserDetailVO, UserDetailVO, Wrapper,
+            AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, UserDetailVO,
+            UserHonorInfoVO, Wrapper,
         },
     },
 };
@@ -27,7 +27,8 @@ pub trait UserBehaviors {
     async fn get_message_count(&self) -> Result<Vec<MessageCountVO>, Error>;
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error>;
     async fn update_token(&mut self) -> Result<(), Error>;
-    async fn get_other_user_detail(&self,id:i32) -> Result<OtherUserDetailVO, Error>;
+    async fn get_other_user_detail(&self, id: i32) -> Result<OtherUserDetailVO, Error>;
+    async fn get_user_honor(&self,id:i32) -> Result<UserHonorInfoVO, Error>;
 }
 
 impl UserBehaviors for Account {
@@ -147,10 +148,7 @@ impl UserBehaviors for Account {
         Ok(())
     }
 
-    async fn get_other_user_detail(
-        &self,
-        id: i32,
-    ) -> Result<OtherUserDetailVO, Error> {
+    async fn get_other_user_detail(&self, id: i32) -> Result<OtherUserDetailVO, Error> {
         Ok(self
             .client
             .get(format!("{}api/user/info/detail/{}", BASE_URL, id))
@@ -159,5 +157,17 @@ impl UserBehaviors for Account {
             .json::<Wrapper<OtherUserDetailVO>>()
             .await?
             .data)
+    }
+
+    async fn get_user_honor(&self,id:i32) -> Result<UserHonorInfoVO, Error> {
+        let res = self
+            .client
+            .get(format!("{}creation-tools/v1/user/center/honor?user_id={}", BASE_URL,id))
+            .header("Cookie", format!("authorization={}", self.token))
+            .send()
+            .await?
+            .json::<UserHonorInfoVO>()
+            .await?;
+        Ok(res)
     }
 }
