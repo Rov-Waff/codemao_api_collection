@@ -54,6 +54,7 @@ pub trait UserBehaviors {
         offset: i32,
         limit: i32,
     ) -> Result<PageWrapper<UserFollowersItems>, Error>;
+    async fn follow_user(&self, user_id: i32) -> Result<(), Error>;
 }
 
 impl UserBehaviors for Account {
@@ -272,6 +273,15 @@ impl UserBehaviors for Account {
             .json::<PageWrapper<UserFollowersItems>>()
             .await?;
         Ok(res)
+    }
+
+    async fn follow_user(&self, user_id: i32) -> Result<(), Error> {
+        self.client
+            .post(format!("{}nemo/v2/user/{}/follow", BASE_URL, user_id))
+            .header("Cookie", format!("authorization={}", self.token))
+            .send()
+            .await?;
+        Ok(())
     }
 }
 
