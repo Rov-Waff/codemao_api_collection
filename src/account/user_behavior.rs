@@ -1,18 +1,12 @@
 use log::{debug, info};
 use std::collections::HashMap;
 
+use crate::account::user_behavior::dtos::*;
 use crate::{
     BASE_URL,
-    account::{
-        Account, Error,
-        dtos::{
-            AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, PageWrapper,
-            RandomUsername, UserCollectedItems, UserDetailVO, UserFollowersItems, UserHonorInfoVO,
-            UserWorksList, Wrapper,
-        },
-    },
+    account::{Account, Error},
 };
-
+pub mod dtos;
 #[allow(dead_code)]
 pub trait UserBehaviors {
     async fn patch_user_detail(
@@ -288,7 +282,7 @@ impl UserBehaviors for Account {
     async fn get_random_username(&self) -> Result<String, Error> {
         Ok(self
             .client
-            .get(format!("{}api/user/random/nickname",BASE_URL))
+            .get(format!("{}api/user/random/nickname", BASE_URL))
             .send()
             .await?
             .json::<Wrapper<RandomUsername>>()

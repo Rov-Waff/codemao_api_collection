@@ -1,12 +1,10 @@
-use dtos::AccountLoginVO;
+use user_behavior::dtos::AccountLoginVO;
 use reqwest::Client;
 use std::{collections::HashMap, time::Duration};
 
 use thiserror::Error;
 
 use crate::BASE_URL;
-
-mod dtos;
 mod user_behavior;
 
 #[derive(Debug)]
