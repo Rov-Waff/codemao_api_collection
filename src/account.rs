@@ -29,8 +29,7 @@ impl Account {
         let client = Client::builder()
             .timeout(Duration::from_secs(2))
             .cookie_store(true)
-            .build()
-            .expect("Failed to create client");
+            .build()?;
         let mut reqbody = HashMap::new();
         reqbody.insert("pid", "65edCTyg");
         reqbody.insert("identity", username);
