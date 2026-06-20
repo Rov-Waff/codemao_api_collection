@@ -151,3 +151,14 @@ pub struct UserCollectedItems{
     pub work_type:i32,
     pub description:String
 }
+
+#[derive(Debug,Serialize,Deserialize)]
+pub struct UserFollowersItems{
+    pub id:i32,
+    pub nickname:String,
+    pub avatar_url:String,
+    pub n_works:i32,
+    pub total_likes:i32,
+    pub is_followed:bool,
+    pub description:String
+}

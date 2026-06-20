@@ -7,7 +7,8 @@ use crate::{
         Account, Error,
         dtos::{
             AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, PageWrapper,
-            UserCollectedItems, UserDetailVO, UserHonorInfoVO, UserWorksList, Wrapper,
+            UserCollectedItems, UserDetailVO, UserFollowersItems, UserHonorInfoVO, UserWorksList,
+            Wrapper,
         },
     },
 };
@@ -41,6 +42,18 @@ pub trait UserBehaviors {
         offset: i32,
         limit: i32,
     ) -> Result<PageWrapper<UserCollectedItems>, Error>;
+    async fn get_user_follower(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserFollowersItems>, Error>;
+    async fn get_user_fans(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserFollowersItems>, Error>;
 }
 
 impl UserBehaviors for Account {
@@ -219,6 +232,44 @@ impl UserBehaviors for Account {
             .send()
             .await?
             .json::<PageWrapper<UserCollectedItems>>()
+            .await?;
+        Ok(res)
+    }
+
+    async fn get_user_follower(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserFollowersItems>, Error> {
+        let res = self
+            .client
+            .get(format!(
+                "{}creation-tools/v1/user/followers?user_id={}&offset={}&limit={}",
+                BASE_URL, user_id, offset, limit
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<UserFollowersItems>>()
+            .await?;
+        Ok(res)
+    }
+
+    async fn get_user_fans(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserFollowersItems>, Error> {
+        let res = self
+            .client
+            .get(format!(
+                "{}creation-tools/v1/user/fans?user_id={}&offset={}&limit={}",
+                BASE_URL, user_id, offset, limit
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<UserFollowersItems>>()
             .await?;
         Ok(res)
     }

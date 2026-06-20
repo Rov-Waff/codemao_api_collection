@@ -84,22 +84,46 @@ async fn test_get_user_honor() {
 }
 
 #[tokio::test]
-async fn test_get_user_works(){
+async fn test_get_user_works() {
     dotenv().ok();
     env_logger::init();
     let username = env::var("USERNAME").expect("env USERNAME not found");
     let password = env::var("PASSWORD").expect("env PASSWORD not found");
     let account = Account::new(&username, &password).await.expect("Fail!");
     let res = account.get_user_works(2615505, 0, 5).await.unwrap();
-    info!("{:?}",res);
+    info!("{:?}", res);
 }
 #[tokio::test]
-async fn test_get_user_collected_works(){
+async fn test_get_user_collected_works() {
     dotenv().ok();
     env_logger::init();
     let username = env::var("USERNAME").expect("env USERNAME not found");
     let password = env::var("PASSWORD").expect("env PASSWORD not found");
     let account = Account::new(&username, &password).await.expect("Fail!");
-    let res=account.get_user_collected_works(2615505, 1, 5).await.unwrap();
-    info!("{:?}",res)
+    let res = account
+        .get_user_collected_works(2615505, 1, 5)
+        .await
+        .unwrap();
+    info!("{:?}", res)
+}
+#[tokio::test]
+async fn test_get_user_followers() {
+    dotenv().ok();
+    env_logger::init();
+    let username = env::var("USERNAME").expect("env USERNAME not found");
+    let password = env::var("PASSWORD").expect("env PASSWORD not found");
+    let account = Account::new(&username, &password).await.expect("Fail!");
+    let res = account.get_user_follower(2615505, 1, 5).await.unwrap();
+    info!("{:?}", res)
+}
+
+#[tokio::test]
+async fn test_get_user_fans() {
+    dotenv().ok();
+    env_logger::init();
+    let username = env::var("USERNAME").expect("env USERNAME not found");
+    let password = env::var("PASSWORD").expect("env PASSWORD not found");
+    let account = Account::new(&username, &password).await.expect("Fail!");
+    let res = account.get_user_fans(2615505, 1, 5).await.unwrap();
+    info!("{:?}", res);
 }
