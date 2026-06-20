@@ -27,7 +27,7 @@ impl CommunityBehavior for Account {
         if banner_type == ALL {
             Ok(self
                 .client
-                .post(format!("{}web/banners/all", BASE_URL))
+                .get(format!("{}web/banners/all", BASE_URL))
                 .send()
                 .await?
                 .json::<SimpleWrapper<BannerItem>>()
@@ -36,7 +36,7 @@ impl CommunityBehavior for Account {
         } else {
             Ok(self
                 .client
-                .post(format!("{}web/banners/all?type={}", BASE_URL, banner_type))
+                .get(format!("{}web/banners/all?type={}", BASE_URL, banner_type))
                 .send()
                 .await?
                 .json::<SimpleWrapper<BannerItem>>()

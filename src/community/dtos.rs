@@ -15,6 +15,6 @@ pub struct BannerItem{
 
 #[derive(Debug,Deserialize,Serialize)]
 pub struct ReasonItem{
-    pub id:i32,
+    pub id:String,
     pub content:String
 }
