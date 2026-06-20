@@ -95,9 +95,15 @@ pub struct PostAReplyVO {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostACommentDTO {
     pub content: String,
-    pub parent_id: i32,
+    pub parent_id: Option<i32>,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostACommentVO {
     pub id: String,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReportPostDTO{
+    pub post_id:String,
+    pub description:String,
+    pub reason_id:String
 }
