@@ -135,3 +135,19 @@ pub struct UserWorksList {
     pub role: String,
     pub is_coll_work: bool,
 }
+
+#[derive(Serialize,Deserialize,Debug)]
+pub struct UserCollectedItems{
+    pub id:i32,
+    pub name:String,
+    pub preview:String,
+    pub user_id:i32,
+    pub nickname:String,
+    pub avatar_url:String,
+    pub views_count:i32,
+    pub likes_count:i32,
+    pub collections_count:i32,
+    pub publish_time:i32,
+    pub work_type:i32,
+    pub description:String
+}

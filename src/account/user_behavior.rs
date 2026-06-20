@@ -7,7 +7,7 @@ use crate::{
         Account, Error,
         dtos::{
             AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, PageWrapper,
-            UserDetailVO, UserHonorInfoVO, UserWorksList, Wrapper,
+            UserCollectedItems, UserDetailVO, UserHonorInfoVO, UserWorksList, Wrapper,
         },
     },
 };
@@ -35,6 +35,12 @@ pub trait UserBehaviors {
         offset: i32,
         limit: i32,
     ) -> Result<PageWrapper<UserWorksList>, Error>;
+    async fn get_user_collected_works(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserCollectedItems>, Error>;
 }
 
 impl UserBehaviors for Account {
@@ -196,6 +202,25 @@ impl UserBehaviors for Account {
             .await?
             .json::<PageWrapper<UserWorksList>>()
             .await?)
+    }
+
+    async fn get_user_collected_works(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserCollectedItems>, Error> {
+        let res = self
+            .client
+            .get(format!(
+                "{}creation-tools/v1/user/center/collect/list?user_id={}&offset={}&limit={}",
+                BASE_URL, user_id, offset, limit
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<UserCollectedItems>>()
+            .await?;
+        Ok(res)
     }
 }
 
