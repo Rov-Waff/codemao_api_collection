@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Debug, Deserialize)]
 pub struct WorkInfoVO {
-    pub id: String,
+    pub id: i32,
     pub work_name: String,
     #[serde(rename = "type")]
     pub work_type: String,
