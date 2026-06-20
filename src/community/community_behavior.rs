@@ -7,10 +7,10 @@ use crate::{
     },
 };
 
-trait CommunityBehavior {
-    async fn signature(&self) -> Result<(), Error>;
-    async fn get_community_banner(&self, banner_type: &str) -> Result<Vec<BannerItem>, Error>;
-    async fn get_report_reasons(&self) -> Result<Vec<ReasonItem>, Error>;
+pub trait CommunityBehavior {
+    fn signature(&self) -> impl std::future::Future<Output = Result<(), Error>> + Send;
+    fn get_community_banner(&self, banner_type: &str) -> impl std::future::Future<Output = Result<Vec<BannerItem>, Error>> + Send;
+    fn get_report_reasons(&self) -> impl std::future::Future<Output = Result<Vec<ReasonItem>, Error>> + Send;
 }
 
 impl CommunityBehavior for Account {
