@@ -6,8 +6,8 @@ use crate::{
     account::{
         Account, Error,
         dtos::{
-            AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, UserDetailVO,
-            UserHonorInfoVO, Wrapper,
+            AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, PageWrapper,
+            UserDetailVO, UserHonorInfoVO, UserWorksList, Wrapper,
         },
     },
 };
@@ -28,7 +28,13 @@ pub trait UserBehaviors {
     async fn get_user_detail(&self) -> Result<UserDetailVO, Error>;
     async fn update_token(&mut self) -> Result<(), Error>;
     async fn get_other_user_detail(&self, id: i32) -> Result<OtherUserDetailVO, Error>;
-    async fn get_user_honor(&self,id:i32) -> Result<UserHonorInfoVO, Error>;
+    async fn get_user_honor(&self, id: i32) -> Result<UserHonorInfoVO, Error>;
+    async fn get_user_works(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserWorksList>, Error>;
 }
 
 impl UserBehaviors for Account {
@@ -159,10 +165,13 @@ impl UserBehaviors for Account {
             .data)
     }
 
-    async fn get_user_honor(&self,id:i32) -> Result<UserHonorInfoVO, Error> {
+    async fn get_user_honor(&self, id: i32) -> Result<UserHonorInfoVO, Error> {
         let res = self
             .client
-            .get(format!("{}creation-tools/v1/user/center/honor?user_id={}", BASE_URL,id))
+            .get(format!(
+                "{}creation-tools/v1/user/center/honor?user_id={}",
+                BASE_URL, id
+            ))
             .header("Cookie", format!("authorization={}", self.token))
             .send()
             .await?
@@ -170,4 +179,25 @@ impl UserBehaviors for Account {
             .await?;
         Ok(res)
     }
+
+    async fn get_user_works(
+        &self,
+        user_id: i32,
+        offset: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<UserWorksList>, Error> {
+        Ok(self
+            .client
+            .get(format!(
+                "{}creation-tools/v1/user/center/work-list?user_id={}&offset={}&limit={}",
+                BASE_URL, user_id, offset, limit
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<UserWorksList>>()
+            .await?)
+    }
 }
+
+#[cfg(test)]
+mod user_behavior_test;
