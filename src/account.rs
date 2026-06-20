@@ -5,7 +5,7 @@ use std::{collections::HashMap, time::Duration};
 use thiserror::Error;
 
 use crate::BASE_URL;
-mod user_behavior;
+pub mod user_behavior;
 
 #[derive(Debug)]
 #[allow(dead_code)]
