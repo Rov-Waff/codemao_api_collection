@@ -162,3 +162,8 @@ pub struct UserFollowersItems{
     pub is_followed:bool,
     pub description:String
 }
+
+#[derive(Debug,Serialize,Deserialize)]
+pub struct RandomUsername{
+    pub nickname:String
+}

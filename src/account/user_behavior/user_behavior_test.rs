@@ -137,3 +137,13 @@ async fn test_follow_user() {
     let account = Account::new(&username, &password).await.expect("Fail!");
     account.follow_user(960922178).await.unwrap();
 }
+
+#[tokio::test]
+async fn test_get_random_username(){
+    dotenv().ok();
+    env_logger::init();
+    let username = env::var("USERNAME").expect("env USERNAME not found");
+    let password = env::var("PASSWORD").expect("env PASSWORD not found");
+    let account = Account::new(&username, &password).await.expect("Fail!");
+    info!("{}",account.get_random_username().await.unwrap());
+}

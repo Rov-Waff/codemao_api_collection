@@ -7,8 +7,8 @@ use crate::{
         Account, Error,
         dtos::{
             AccountLoginVO, FieldTypes, MessageCountVO, OtherUserDetailVO, PageWrapper,
-            UserCollectedItems, UserDetailVO, UserFollowersItems, UserHonorInfoVO, UserWorksList,
-            Wrapper,
+            RandomUsername, UserCollectedItems, UserDetailVO, UserFollowersItems, UserHonorInfoVO,
+            UserWorksList, Wrapper,
         },
     },
 };
@@ -55,6 +55,7 @@ pub trait UserBehaviors {
         limit: i32,
     ) -> Result<PageWrapper<UserFollowersItems>, Error>;
     async fn follow_user(&self, user_id: i32) -> Result<(), Error>;
+    async fn get_random_username(&self) -> Result<String, Error>;
 }
 
 impl UserBehaviors for Account {
@@ -282,6 +283,18 @@ impl UserBehaviors for Account {
             .send()
             .await?;
         Ok(())
+    }
+
+    async fn get_random_username(&self) -> Result<String, Error> {
+        Ok(self
+            .client
+            .get(format!("{}api/user/random/nickname",BASE_URL))
+            .send()
+            .await?
+            .json::<Wrapper<RandomUsername>>()
+            .await?
+            .data
+            .nickname)
     }
 }
 
