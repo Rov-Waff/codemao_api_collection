@@ -10,10 +10,10 @@ mod user_behavior;
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Account {
-    username: String,
-    password: String,
-    token: String,
-    client: Client,
+    pub username: String,
+    pub password: String,
+    pub token: String,
+    pub client: Client,
 }
 
 #[derive(Error, Debug)]
