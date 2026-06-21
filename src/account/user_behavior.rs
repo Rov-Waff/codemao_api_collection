@@ -1,3 +1,10 @@
+//! 账户用户行为辅助函数。
+//!
+//! 本模块提供 `UserBehaviors` trait 及其对 `Account` 的实现。
+//! 包含用于与远程用户/账户相关接口（资料、密码、关注者、作品等）交互的便捷异步方法。
+//!
+//! 使用方法：导入该 trait 后即可在 `Account` 实例上调用这些扩展方法。
+
 use log::{debug, info};
 use std::collections::HashMap;
 
@@ -8,6 +15,10 @@ use crate::{
 };
 pub mod dtos;
 #[allow(dead_code)]
+/// 账户相关用户行为扩展方法。
+///
+/// 方法为异步并返回 `Result<..., Error>`。已在本模块为 `Account` 实现，
+/// 导入该 trait 后即可在 `Account` 上直接调用这些辅助方法。
 pub trait UserBehaviors {
     fn patch_user_detail(
         &mut self,
@@ -18,38 +29,69 @@ pub trait UserBehaviors {
         birthday: Option<i64>,
         avatar_url: Option<&str>,
     ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
-    fn patch_user_password(&self, old_password: &str, password: &str) -> impl std::future::Future<Output = Result<(), Error>> + Send;
-    fn get_message_count(&self) -> impl std::future::Future<Output = Result<Vec<MessageCountVO>, Error>> + Send;
-    fn get_user_detail(&self) -> impl std::future::Future<Output = Result<UserDetailVO, Error>> + Send;
+    /// 修改当前账户密码。
+    ///
+    /// `old_password` 为旧密码，`password` 为新密码。
+    fn patch_user_password(
+        &self,
+        old_password: &str,
+        password: &str,
+    ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
+    fn get_message_count(
+        &self,
+    ) -> impl std::future::Future<Output = Result<Vec<MessageCountVO>, Error>> + Send;
+    /// 获取当前登录用户的详细信息。
+    fn get_user_detail(
+        &self,
+    ) -> impl std::future::Future<Output = Result<UserDetailVO, Error>> + Send;
     fn update_token(&mut self) -> impl std::future::Future<Output = Result<(), Error>> + Send;
-    fn get_other_user_detail(&self, id: i32) -> impl std::future::Future<Output = Result<OtherUserDetailVO, Error>> + Send;
-    fn get_user_honor(&self, id: i32) -> impl std::future::Future<Output = Result<UserHonorInfoVO, Error>> + Send;
+    /// 根据用户 id 获取他人的公开资料。
+    fn get_other_user_detail(
+        &self,
+        id: i32,
+    ) -> impl std::future::Future<Output = Result<OtherUserDetailVO, Error>> + Send;
+    /// 获取用户荣誉/勋章信息。
+    fn get_user_honor(
+        &self,
+        id: i32,
+    ) -> impl std::future::Future<Output = Result<UserHonorInfoVO, Error>> + Send;
+    /// 列出用户创建的作品。
     fn get_user_works(
         &self,
         user_id: i32,
         offset: i32,
         limit: i32,
     ) -> impl std::future::Future<Output = Result<PageWrapper<UserWorksList>, Error>> + Send;
+    /// 列出用户收藏的作品。
     fn get_user_collected_works(
         &self,
         user_id: i32,
         offset: i32,
         limit: i32,
     ) -> impl std::future::Future<Output = Result<PageWrapper<UserCollectedItems>, Error>> + Send;
+    /// 列出指定用户关注的人。
     fn get_user_follower(
         &self,
         user_id: i32,
         offset: i32,
         limit: i32,
     ) -> impl std::future::Future<Output = Result<PageWrapper<UserFollowersItems>, Error>> + Send;
+    /// 列出指定用户的粉丝（关注者）。
     fn get_user_fans(
         &self,
         user_id: i32,
         offset: i32,
         limit: i32,
     ) -> impl std::future::Future<Output = Result<PageWrapper<UserFollowersItems>, Error>> + Send;
-    fn follow_user(&self, user_id: i32) -> impl std::future::Future<Output = Result<(), Error>> + Send;
-    fn get_random_username(&self) -> impl std::future::Future<Output = Result<String, Error>> + Send;
+    /// 关注某个用户（当前登录账户关注 `user_id`）。
+    fn follow_user(
+        &self,
+        user_id: i32,
+    ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
+    /// 从服务端请求一个可用的随机用户名。
+    fn get_random_username(
+        &self,
+    ) -> impl std::future::Future<Output = Result<String, Error>> + Send;
 }
 
 impl UserBehaviors for Account {

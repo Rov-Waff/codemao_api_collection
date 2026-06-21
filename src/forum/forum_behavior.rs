@@ -1,3 +1,7 @@
+//! # 论坛行为
+//!
+//! 包含了api.codemao.cn下的和论坛相关的所有论坛相关的API接口
+//!
 use crate::{
     Account, BASE_URL,
     account::{Error, user_behavior::dtos::PageWrapper},
@@ -9,23 +13,73 @@ use crate::{
 };
 
 pub trait ForumBehavior {
+    /// 获取全部板块
+    ///
+    /// # 参数
+    ///
+    /// 无需参数
+    ///
+    /// # 返回
+    ///
+    /// 如果正常工作，则返回`Vec<codemao_api_collection::forum::dtos::BoardItem>`
     fn get_all_board_info(
         &self,
     ) -> impl std::future::Future<Output = Result<Vec<BoardItem>, Error>> + Send;
+    /// 获取板块信息
+    ///
+    /// # 参数
+    ///
+    /// board_id:i32 板块ID
+    ///
+    /// # 返回
+    ///
+    /// 如果正常工作，则返回`codemao_api_collection::forum::dtos::BoardInfoVO`
     fn get_board_info(
         &self,
         board_id: i32,
     ) -> impl std::future::Future<Output = Result<BoardInfoVO, Error>> + Send;
+    /// 获取公告板
+    ///
+    /// # 参数
+    ///
+    /// limit:Option<i32> 返回最大条数
+    ///
+    /// # 返回
+    ///
+    /// 如果正常工作，则返回`codemao_api_collection::community::dtos::NoticeBoardItem<codemao_api_collection::forum::dtos::NoticeBoardItem>`
     fn get_notice_board(
         &self,
         limit: Option<i32>,
     ) -> impl std::future::Future<Output = Result<SimpleWrapper<NoticeBoardItem>, Error>> + Send;
+    /// 搜索帖子
+    ///
+    /// # 参数
+    ///
+    /// title:&str 帖子标题
+    /// page:Option<i32> 页码
+    /// limit:Option<i32> 每页条数
+    ///
+    /// # 返回
+    ///
+    /// 如果正常工作，则返回`codemao_api_collection::account::user_behavior::dtos<codemao_api_collection::forum::dtos::SearchPostItem>`
     fn search_posts(
         &self,
         title: &str,
         page: Option<i32>,
         limit: Option<i32>,
     ) -> impl std::future::Future<Output = Result<PageWrapper<SearchPostItem>, Error>> + Send;
+    /// 发布一个帖子
+    /// 
+    /// # 参数
+    /// 
+    /// title: &str 标题
+    /// content: &str 内容
+    /// board_id: i32 板块ID
+    /// studio_id: Option<String> 工作室ID，可选
+    /// 
+    /// # 返回
+    /// 
+    /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostAPostVO`
     fn post_a_post(
         &self,
         title: &str,
@@ -33,25 +87,75 @@ pub trait ForumBehavior {
         board_id: i32,
         studio_id: Option<String>,
     ) -> impl std::future::Future<Output = Result<PostAPostVO, Error>> + Send;
+    /// 删除一个帖子
+    /// 
+    /// # 参数
+    /// 
+    /// post_id: i32 帖子ID
+    /// 
+    /// # 返回
+    /// 
+    /// 如果正常工作，则返回 `()`
     fn delete_a_post(
         &self,
         post_id: i32,
     ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
+    /// 举报一个帖子
+    /// 
+    /// # 参数
+    /// 
+    /// post_id: i32 帖子ID
+    /// description: &str 举报描述
+    /// reason_id: i32 举报原因ID
+    /// 
+    /// # 返回
+    /// 
+    /// 如果正常工作，则返回 `()`
     fn report_a_post(
         &self,
         post_id: i32,
         description: &str,
         reason_id: i32,
     ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
+    /// 获取帖子详情
+    /// 
+    /// # 参数
+    /// 
+    /// post_id: i32 帖子ID
+    /// 
+    /// # 返回
+    /// 
+    /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostDetailVO`
     fn get_post_detail(
         &self,
         post_id: i32,
     ) -> impl std::future::Future<Output = Result<PostDetailVO, Error>> + Send;
+    /// 回复一个帖子
+    /// 
+    /// # 参数
+    /// 
+    /// content: &str 内容
+    /// post_id: i32 帖子ID
+    /// 
+    /// # 返回
+    /// 
+    /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostAReplyVO`
     fn post_a_reply(
         &self,
         content: &str,
         post_id: i32,
     ) -> impl std::future::Future<Output = Result<PostAReplyVO, Error>> + Send;
+    /// 评论一个回复
+    /// 
+    /// # 参数
+    /// 
+    /// content: &str 内容
+    /// reply_id: i32 回复ID
+    /// parent_id: Option<i32> 父评论ID，可选
+    /// 
+    /// # 返回
+    /// 
+    /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostACommentVO`
     fn post_a_comment(
         &self,
         content: &str,
