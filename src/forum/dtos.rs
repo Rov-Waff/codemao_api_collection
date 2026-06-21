@@ -5,7 +5,7 @@ pub struct BoardItem {
     pub id: String,
     pub name: String,
     pub icon_url: String,
-    pub is_hot: String,
+    pub is_hot: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -31,20 +31,20 @@ pub struct SearchPostItem {
     pub id: String,
     pub title: String,
     pub content: String,
-    pub n_replies: String,
+    pub n_replies: i32,
     pub is_authorized: bool,
     pub is_featured: bool,
     pub is_hotted: bool,
     pub is_pinned: bool,
     pub tutorial_flag: i32,
     pub ask_help_flag: i32,
-    pub create_at: i32,
+    pub created_at: i32,
     pub n_comments: i32,
     pub replied_at: i32,
     pub commented_at: i32,
     pub user: UserFieldInSearchPostItem,
-    pub reply_user: Option<UserFieldInSearchPostItem>,
-    pub comment_user: Option<UserFieldInSearchPostItem>,
+    pub reply_user: CommentUserFieldInSearchPostItem,
+    pub comment_user: CommentUserFieldInSearchPostItem,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserFieldInSearchPostItem {
@@ -54,6 +54,12 @@ pub struct UserFieldInSearchPostItem {
     pub subject_id: i32,
     pub work_shop_name: String,
     pub work_shop_level: i32,
+}
+#[derive(Debug,Serialize,Deserialize)]
+pub struct CommentUserFieldInSearchPostItem{
+    pub id :String,
+    pub nickname:String,
+    pub avatar_url:String,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostAPostDTO {
@@ -72,7 +78,7 @@ pub struct PostDetailVO {
     pub content: String,
     pub board_id: String,
     pub board_name: String,
-    pub update_at: i32,
+    pub updated_at: i32,
     pub created_at: i32,
     pub n_views: i32,
     pub n_replies: i32,
@@ -82,7 +88,7 @@ pub struct PostDetailVO {
     pub is_hotted: bool,
     pub is_pinned: bool,
     pub tutorial_flag: i32,
-    pub ask_help_plag: i32,
+    pub ask_help_flag: i32
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostAReplyDTO {

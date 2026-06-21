@@ -1,6 +1,6 @@
 use crate::{
     Account, BASE_URL,
-    account::{Error, user_behavior::dtos::Wrapper},
+    account::{Error, user_behavior::dtos::PageWrapper},
     community::dtos::SimpleWrapper,
     forum::dtos::{
         BoardInfoVO, BoardItem, NoticeBoardItem, PostACommentDTO, PostACommentVO, PostAPostDTO,
@@ -19,13 +19,13 @@ pub trait ForumBehavior {
     fn get_notice_board(
         &self,
         limit: Option<i32>,
-    ) -> impl std::future::Future<Output = Result<Wrapper<NoticeBoardItem>, Error>> + Send;
+    ) -> impl std::future::Future<Output = Result<SimpleWrapper<NoticeBoardItem>, Error>> + Send;
     fn search_posts(
         &self,
         title: &str,
         page: Option<i32>,
         limit: Option<i32>,
-    ) -> impl std::future::Future<Output = Result<Wrapper<SearchPostItem>, Error>> + Send;
+    ) -> impl std::future::Future<Output = Result<PageWrapper<SearchPostItem>, Error>> + Send;
     fn post_a_post(
         &self,
         title: &str,
@@ -85,21 +85,21 @@ impl ForumBehavior for Account {
     async fn get_notice_board(
         &self,
         limit: Option<i32>,
-    ) -> Result<Wrapper<NoticeBoardItem>, Error> {
+    ) -> Result<SimpleWrapper<NoticeBoardItem>, Error> {
         match limit {
             Some(l) => Ok(self
                 .client
                 .get(format!("{}web/forums/notice-boards?limit={}", BASE_URL, l))
                 .send()
                 .await?
-                .json::<Wrapper<NoticeBoardItem>>()
+                .json::<SimpleWrapper<NoticeBoardItem>>()
                 .await?),
             None => Ok(self
                 .client
                 .get(format!("{}web/forums/notice-boards", BASE_URL))
                 .send()
                 .await?
-                .json::<Wrapper<NoticeBoardItem>>()
+                .json::<SimpleWrapper<NoticeBoardItem>>()
                 .await?),
         }
     }
@@ -109,7 +109,7 @@ impl ForumBehavior for Account {
         title: &str,
         page: Option<i32>,
         limit: Option<i32>,
-    ) -> Result<Wrapper<SearchPostItem>, Error> {
+    ) -> Result<PageWrapper<SearchPostItem>, Error> {
         let mut url = format!("{}web/forums/posts/search", BASE_URL);
         let mut params = Vec::new();
         params.push(format!("title={}", title));
@@ -129,7 +129,7 @@ impl ForumBehavior for Account {
             .get(url)
             .send()
             .await?
-            .json::<Wrapper<SearchPostItem>>()
+            .json::<PageWrapper<SearchPostItem>>()
             .await?)
     }
 
