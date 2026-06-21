@@ -70,3 +70,7 @@ pub mod forum;
 pub mod works;
 const BASE_URL: &str = "https://api.codemao.cn/";
 pub use account::Account;
+pub use account::user_behavior::UserBehaviors;
+pub use community::community_behavior::CommunityBehavior;
+pub use forum::forum_behavior::ForumBehavior;
+pub use works::work_behavior::WorkBehavior;
