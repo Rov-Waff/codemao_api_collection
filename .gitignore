@@ -47,3 +47,11 @@ $RECYCLE.BIN/
 *.iws
 *.iml
 *.ipr
+
+# Python / maturin
+dist/
+__pycache__/
+*.pyc
+.cache/
+*.egg-info/
+.venv/

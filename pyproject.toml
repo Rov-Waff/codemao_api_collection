@@ -1,0 +1,15 @@
+[build-system]
+requires = ["maturin>=1.8,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "codemao_api_collection"
+requires-python = ">=3.8"
+description = "编程猫社区api集合 — Python 绑定"
+license = { text = "MIT" }
+readme = "README.md"
+
+[tool.maturin]
+features = ["python"]
+module-name = "codemao_api_collection"
+strip = true
