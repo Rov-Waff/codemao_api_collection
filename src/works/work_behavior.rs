@@ -8,6 +8,8 @@ use crate::{
     account::Error,
     works::dtos::{ReportWorkDTO, WorkInfoVO, WorkTreeVO},
 };
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
 
 pub trait WorkBehavior {
     /// 取消发布一个已经发布的作品
@@ -109,5 +111,35 @@ impl WorkBehavior for Account {
             .await?
             .json::<WorkTreeVO>()
             .await?)
+    }
+}
+
+#[cfg(feature = "python")]
+#[pymethods]
+impl Account {
+    fn unpublish_work(&self, work_id: i32) -> PyResult<()> {
+        crate::account::get_runtime().block_on(WorkBehavior::unpublish_work(self, work_id))?;
+        Ok(())
+    }
+
+    fn get_work_info<'py>(&self, work_id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            WorkBehavior::get_work_info(self, work_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn report_work(&self, report_describe: String, report_reasons: String, work_id: i32) -> PyResult<()> {
+        crate::account::get_runtime().block_on(
+            WorkBehavior::report_work(self, report_describe, report_reasons, work_id)
+        )?;
+        Ok(())
+    }
+
+    fn get_work_tree<'py>(&self, work_id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            WorkBehavior::get_work_tree(self, work_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
     }
 }

@@ -7,8 +7,12 @@ use thiserror::Error;
 use crate::BASE_URL;
 pub mod user_behavior;
 
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
+
 #[derive(Debug)]
 #[allow(dead_code)]
+#[cfg_attr(feature = "python", pyclass)]
 pub struct Account {
     pub username: String,
     pub password: String,
@@ -50,6 +54,29 @@ impl Account {
             token,
             client,
         })
+    }
+}
+
+#[cfg(feature = "python")]
+impl From<Error> for PyErr {
+    fn from(err: Error) -> PyErr {
+        pyo3::exceptions::PyRuntimeError::new_err(err.to_string())
+    }
+}
+
+#[cfg(feature = "python")]
+pub(crate) fn get_runtime() -> &'static tokio::runtime::Runtime {
+    use std::sync::OnceLock;
+    static RUNTIME: OnceLock<tokio::runtime::Runtime> = OnceLock::new();
+    RUNTIME.get_or_init(|| tokio::runtime::Runtime::new().expect("Failed to create tokio runtime"))
+}
+
+#[cfg(feature = "python")]
+#[pymethods]
+impl Account {
+    #[staticmethod]
+    fn create(username: String, password: String) -> PyResult<Self> {
+        get_runtime().block_on(Account::new(&username, &password)).map_err(Into::into)
     }
 }
 

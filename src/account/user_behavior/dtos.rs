@@ -7,7 +7,6 @@ pub enum FieldTypes {
     Int(i64),
     String(String),
 }
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AccountLoginVO {
     pub auth: AccountLoginVOAuth,

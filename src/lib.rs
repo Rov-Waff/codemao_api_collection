@@ -74,3 +74,58 @@ pub use account::user_behavior::UserBehaviors;
 pub use community::community_behavior::CommunityBehavior;
 pub use forum::forum_behavior::ForumBehavior;
 pub use works::work_behavior::WorkBehavior;
+
+#[cfg(feature = "python")]
+pub mod python_bindings {
+    use pyo3::prelude::*;
+    use pyo3::conversion::IntoPyObject;
+    use pyo3::types::{PyDict, PyDictMethods, PyList};
+
+    /// Convert any `serde::Serialize` type to a Python object (dict/list/primitives).
+    /// Requires a `Python<'_>` token (available from pymethod signatures).
+    pub fn to_pyobject<'py, T: serde::Serialize>(value: &T, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let json = serde_json::to_value(value)
+            .map_err(|e| pyo3::exceptions::PyTypeError::new_err(e.to_string()))?;
+        json_to_py(py, &json)
+    }
+
+    fn json_to_py<'py>(py: Python<'py>, value: &serde_json::Value) -> PyResult<Bound<'py, PyAny>> {
+        match value {
+            serde_json::Value::Null => Ok(py.None().into_bound(py)),
+            serde_json::Value::Bool(b) => Ok(Bound::clone(&bool::into_pyobject(*b, py).unwrap()).into_any()),
+            serde_json::Value::Number(n) => {
+                if let Some(i) = n.as_i64() {
+                    Ok(i.into_pyobject(py).unwrap().into_any())
+                } else if let Some(f) = n.as_f64() {
+                    Ok(f.into_pyobject(py).unwrap().into_any())
+                } else {
+                    Ok(n.to_string().into_pyobject(py).unwrap().into_any())
+                }
+            }
+            serde_json::Value::String(s) => Ok(s.as_str().into_pyobject(py).unwrap().into_any()),
+            serde_json::Value::Array(arr) => {
+                let items: PyResult<Vec<Bound<'_, PyAny>>> = arr.iter().map(|item| json_to_py(py, item)).collect();
+                let list = PyList::new(py, items?)?;
+                Ok(list.into_any())
+            }
+            serde_json::Value::Object(obj) => {
+                let dict = PyDict::new(py);
+                for (k, v) in obj {
+                    let key = k.as_str().into_pyobject(py).unwrap();
+                    let val = json_to_py(py, v)?;
+                    dict.set_item(key, val)?;
+                }
+                Ok(dict.into_any())
+            }
+        }
+    }
+
+    #[pymodule]
+    pub fn codemao_api_collection(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+        m.add_class::<crate::Account>()?;
+        Ok(())
+    }
+}
+
+#[cfg(feature = "python")]
+pub use python_bindings::codemao_api_collection;

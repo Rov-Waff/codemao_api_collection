@@ -13,6 +13,8 @@ use crate::{
     BASE_URL,
     account::{Account, Error},
 };
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
 pub mod dtos;
 #[allow(dead_code)]
 /// 账户相关用户行为扩展方法。
@@ -332,3 +334,106 @@ impl UserBehaviors for Account {
 
 #[cfg(test)]
 mod user_behavior_test;
+
+#[cfg(feature = "python")]
+#[pymethods]
+impl Account {
+    fn patch_user_detail(
+        &mut self,
+        nickname: Option<String>,
+        fullname: Option<String>,
+        description: Option<String>,
+        sex: Option<i32>,
+        birthday: Option<i64>,
+        avatar_url: Option<String>,
+    ) -> PyResult<()> {
+        crate::account::get_runtime().block_on(UserBehaviors::patch_user_detail(
+            self,
+            nickname.as_deref(),
+            fullname.as_deref(),
+            description.as_deref(),
+            sex.map(|s| s as i8),
+            birthday,
+            avatar_url.as_deref(),
+        ))?;
+        Ok(())
+    }
+
+    fn patch_user_password(&self, old_password: &str, password: &str) -> PyResult<()> {
+        crate::account::get_runtime().block_on(
+            UserBehaviors::patch_user_password(self, old_password, password)
+        )?;
+        Ok(())
+    }
+
+    fn get_message_count<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_message_count(self)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_user_detail<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_user_detail(self)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn update_token(&mut self) -> PyResult<()> {
+        crate::account::get_runtime().block_on(UserBehaviors::update_token(self))?;
+        Ok(())
+    }
+
+    fn get_other_user_detail<'py>(&self, id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_other_user_detail(self, id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_user_honor<'py>(&self, id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_user_honor(self, id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_user_works<'py>(&self, user_id: i32, offset: i32, limit: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_user_works(self, user_id, offset, limit)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_user_collected_works<'py>(&self, user_id: i32, offset: i32, limit: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_user_collected_works(self, user_id, offset, limit)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_user_follower<'py>(&self, user_id: i32, offset: i32, limit: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_user_follower(self, user_id, offset, limit)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_user_fans<'py>(&self, user_id: i32, offset: i32, limit: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            UserBehaviors::get_user_fans(self, user_id, offset, limit)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn follow_user(&self, user_id: i32) -> PyResult<()> {
+        crate::account::get_runtime().block_on(UserBehaviors::follow_user(self, user_id))?;
+        Ok(())
+    }
+
+    fn get_random_username(&self) -> PyResult<String> {
+        crate::account::get_runtime().block_on(UserBehaviors::get_random_username(self))
+            .map_err(Into::into)
+    }
+}

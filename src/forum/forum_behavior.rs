@@ -11,6 +11,8 @@ use crate::{
         PostAPostVO, PostAReplyDTO, PostAReplyVO, PostDetailVO, ReportPostDTO, SearchPostItem,
     },
 };
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
 
 pub trait ForumBehavior {
     /// 获取全部板块
@@ -334,5 +336,77 @@ impl ForumBehavior for Account {
             .await?
             .json::<PostACommentVO>()
             .await?)
+    }
+}
+
+#[cfg(feature = "python")]
+#[pymethods]
+impl Account {
+    fn get_all_board_info<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::get_all_board_info(self)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_board_info<'py>(&self, board_id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::get_board_info(self, board_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_notice_board<'py>(&self, limit: Option<i32>, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::get_notice_board(self, limit)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn search_posts<'py>(&self, title: &str, page: Option<i32>, limit: Option<i32>, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::search_posts(self, title, page, limit)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn post_a_post<'py>(&self, title: &str, content: &str, board_id: i32, studio_id: Option<String>, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::post_a_post(self, title, content, board_id, studio_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn delete_a_post(&self, post_id: i32) -> PyResult<()> {
+        crate::account::get_runtime().block_on(ForumBehavior::delete_a_post(self, post_id))?;
+        Ok(())
+    }
+
+    fn report_a_post(&self, post_id: i32, description: &str, reason_id: i32) -> PyResult<()> {
+        crate::account::get_runtime().block_on(
+            ForumBehavior::report_a_post(self, post_id, description, reason_id)
+        )?;
+        Ok(())
+    }
+
+    fn get_post_detail<'py>(&self, post_id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::get_post_detail(self, post_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn post_a_reply<'py>(&self, content: &str, post_id: i32, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::post_a_reply(self, content, post_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn post_a_comment<'py>(&self, content: &str, reply_id: i32, parent_id: Option<i32>, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            ForumBehavior::post_a_comment(self, content, reply_id, parent_id)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
     }
 }

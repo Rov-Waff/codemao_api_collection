@@ -11,6 +11,8 @@ use crate::{
         dtos::{BannerItem, ReasonItem, SimpleWrapper},
     },
 };
+#[cfg(feature = "python")]
+use pyo3::prelude::*;
 
 /// Trait that provides community-related API actions for an Account.
 ///
@@ -76,5 +78,28 @@ impl CommunityBehavior for Account {
             .json::<SimpleWrapper<ReasonItem>>()
             .await?
             .items)
+    }
+}
+
+#[cfg(feature = "python")]
+#[pymethods]
+impl Account {
+    fn signature(&self) -> PyResult<()> {
+        crate::account::get_runtime().block_on(CommunityBehavior::signature(self))?;
+        Ok(())
+    }
+
+    fn get_community_banner<'py>(&self, banner_type: &str, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            CommunityBehavior::get_community_banner(self, banner_type)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
+    }
+
+    fn get_report_reasons<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyAny>> {
+        let result = crate::account::get_runtime().block_on(
+            CommunityBehavior::get_report_reasons(self)
+        )?;
+        crate::python_bindings::to_pyobject(&result, py)
     }
 }
