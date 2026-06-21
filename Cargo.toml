@@ -1,6 +1,6 @@
 [package]
 name = "codemao_api_collection"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MIT"
 description = "编程猫社区api集合"
