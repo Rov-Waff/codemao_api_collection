@@ -182,6 +182,12 @@ pub trait ForumBehavior {
         page: i32,
         limit: i32,
     ) -> impl Future<Output = Result<PageWrapper<GetCommentVO>, Error>> + Send;
+    fn get_posts_in_board(
+        &self,
+        board_id: i32,
+        page: i32,
+        limit: i32,
+    ) -> impl Future<Output = Result<PageWrapper<SearchPostItem>, Error>> + Send;
 }
 
 impl ForumBehavior for Account {
@@ -417,6 +423,23 @@ impl ForumBehavior for Account {
             .send()
             .await?
             .json::<PageWrapper<GetCommentVO>>()
+            .await?)
+    }
+    async fn get_posts_in_board(
+        &self,
+        board_id: i32,
+        page: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<SearchPostItem>, Error> {
+        Ok(self
+            .client
+            .get(format!(
+                "{}web/forums/boards/{}/posts?page={}&limit={}",
+                BASE_URL, board_id, page, limit
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<SearchPostItem>>()
             .await?)
     }
 }
