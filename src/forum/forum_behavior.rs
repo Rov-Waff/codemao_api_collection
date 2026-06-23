@@ -7,8 +7,9 @@ use crate::{
     account::{Error, user_behavior::dtos::PageWrapper},
     community::dtos::SimpleWrapper,
     forum::dtos::{
-        BoardInfoVO, BoardItem, NoticeBoardItem, PostACommentDTO, PostACommentVO, PostAPostDTO,
-        PostAPostVO, PostAReplyDTO, PostAReplyVO, PostDetailVO, ReportPostDTO, SearchPostItem,
+        BoardInfoVO, BoardItem, GetCommentVO, GetRepliesVO, NoticeBoardItem, PostACommentDTO,
+        PostACommentVO, PostAPostDTO, PostAPostVO, PostAReplyDTO, PostAReplyVO, PostDetailVO,
+        ReportPostDTO, SearchPostItem,
     },
 };
 
@@ -69,16 +70,16 @@ pub trait ForumBehavior {
         limit: Option<i32>,
     ) -> impl std::future::Future<Output = Result<PageWrapper<SearchPostItem>, Error>> + Send;
     /// 发布一个帖子
-    /// 
+    ///
     /// # 参数
-    /// 
+    ///
     /// title: &str 标题
     /// content: &str 内容
     /// board_id: i32 板块ID
     /// studio_id: Option<String> 工作室ID，可选
-    /// 
+    ///
     /// # 返回
-    /// 
+    ///
     /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostAPostVO`
     fn post_a_post(
         &self,
@@ -88,28 +89,28 @@ pub trait ForumBehavior {
         studio_id: Option<String>,
     ) -> impl std::future::Future<Output = Result<PostAPostVO, Error>> + Send;
     /// 删除一个帖子
-    /// 
+    ///
     /// # 参数
-    /// 
+    ///
     /// post_id: i32 帖子ID
-    /// 
+    ///
     /// # 返回
-    /// 
+    ///
     /// 如果正常工作，则返回 `()`
     fn delete_a_post(
         &self,
         post_id: i32,
     ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
     /// 举报一个帖子
-    /// 
+    ///
     /// # 参数
-    /// 
+    ///
     /// post_id: i32 帖子ID
     /// description: &str 举报描述
     /// reason_id: i32 举报原因ID
-    /// 
+    ///
     /// # 返回
-    /// 
+    ///
     /// 如果正常工作，则返回 `()`
     fn report_a_post(
         &self,
@@ -118,27 +119,27 @@ pub trait ForumBehavior {
         reason_id: i32,
     ) -> impl std::future::Future<Output = Result<(), Error>> + Send;
     /// 获取帖子详情
-    /// 
+    ///
     /// # 参数
-    /// 
+    ///
     /// post_id: i32 帖子ID
-    /// 
+    ///
     /// # 返回
-    /// 
+    ///
     /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostDetailVO`
     fn get_post_detail(
         &self,
         post_id: i32,
     ) -> impl std::future::Future<Output = Result<PostDetailVO, Error>> + Send;
     /// 回复一个帖子
-    /// 
+    ///
     /// # 参数
-    /// 
+    ///
     /// content: &str 内容
     /// post_id: i32 帖子ID
-    /// 
+    ///
     /// # 返回
-    /// 
+    ///
     /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostAReplyVO`
     fn post_a_reply(
         &self,
@@ -146,15 +147,15 @@ pub trait ForumBehavior {
         post_id: i32,
     ) -> impl std::future::Future<Output = Result<PostAReplyVO, Error>> + Send;
     /// 评论一个回复
-    /// 
+    ///
     /// # 参数
-    /// 
+    ///
     /// content: &str 内容
     /// reply_id: i32 回复ID
     /// parent_id: Option<i32> 父评论ID，可选
-    /// 
+    ///
     /// # 返回
-    /// 
+    ///
     /// 如果正常工作，则返回 `codemao_api_collection::forum::dtos::PostACommentVO`
     fn post_a_comment(
         &self,
@@ -162,6 +163,25 @@ pub trait ForumBehavior {
         reply_id: i32,
         parent_id: Option<i32>,
     ) -> impl std::future::Future<Output = Result<PostACommentVO, Error>> + Send;
+    /// 获取一组热门板块的帖子ID
+    fn get_hot_board_post_ids(&self) -> impl Future<Output = Result<Vec<String>, Error>> + Send;
+    fn get_some_post_details(
+        &self,
+        post_ids: &[String],
+    ) -> impl Future<Output = Result<Vec<SearchPostItem>, Error>> + Send;
+    // 获取一个帖子的一页的回复
+    fn get_replies_by_post_id(
+        &self,
+        post_id: i32,
+        page: i32,
+        limit: i32,
+    ) -> impl Future<Output = Result<PageWrapper<GetRepliesVO>, Error>> + Send;
+    fn get_comments_by_reply_id(
+        &self,
+        reply_id: i32,
+        page: i32,
+        limit: i32,
+    ) -> impl Future<Output = Result<PageWrapper<GetCommentVO>, Error>> + Send;
 }
 
 impl ForumBehavior for Account {
@@ -333,6 +353,70 @@ impl ForumBehavior for Account {
             .send()
             .await?
             .json::<PostACommentVO>()
+            .await?)
+    }
+
+    async fn get_hot_board_post_ids(&self) -> Result<Vec<String>, Error> {
+        Ok(self
+            .client
+            .get(format!("{}web/forums/posts/hots/all", BASE_URL))
+            .send()
+            .await?
+            .json::<SimpleWrapper<String>>()
+            .await?
+            .items)
+    }
+
+    async fn get_some_post_details(
+        &self,
+        post_ids: &[String],
+    ) -> Result<Vec<SearchPostItem>, Error> {
+        let url = format!(
+            "{}web/forums/posts/all?ids={}",
+            BASE_URL,
+            post_ids.join(",")
+        );
+        Ok(self
+            .client
+            .get(url)
+            .send()
+            .await?
+            .json::<SimpleWrapper<SearchPostItem>>()
+            .await?
+            .items)
+    }
+    async fn get_replies_by_post_id(
+        &self,
+        post_id: i32,
+        page: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<GetRepliesVO>, Error> {
+        Ok(self
+            .client
+            .get(format!(
+                "{}web/forums/posts/{}/replies?page={}&limit={}&sort=-created_at",
+                BASE_URL, post_id, page, limit
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<GetRepliesVO>>()
+            .await?)
+    }
+    async fn get_comments_by_reply_id(
+        &self,
+        reply_id: i32,
+        page: i32,
+        limit: i32,
+    ) -> Result<PageWrapper<GetCommentVO>, Error> {
+        Ok(self
+            .client
+            .get(format!(
+                "{}web/forums/replies/{}/comments?limit={}&page={}",
+                BASE_URL, reply_id, limit, page
+            ))
+            .send()
+            .await?
+            .json::<PageWrapper<GetCommentVO>>()
             .await?)
     }
 }

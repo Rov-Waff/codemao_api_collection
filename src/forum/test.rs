@@ -131,3 +131,21 @@ async fn test_delete_a_post(){
     let account = Account::new(&username, &password).await.unwrap();
     account.delete_a_post(1651216).await.unwrap();
 }
+
+#[tokio::test]
+async fn test_get_some_post_id(){
+    dotenv().ok();
+    env_logger::init();
+    let username = env::var("USERNAME").expect("env USERNAME not found");
+    let password = env::var("PASSWORD").expect("env PASSWORD not found");
+    let account = Account::new(&username, &password).await.unwrap();
+    let res = account.get_hot_board_post_ids().await.unwrap();
+    info!("RESULT!   {:?}",res);
+    let ids = &res[..4];
+    let res2=account.get_some_post_details(ids).await.unwrap();
+    info!("{:?}",res2);
+    let res = account.get_replies_by_post_id(1647257, 1, 5).await.unwrap();
+    info!("{:?}",res);
+    let res = account.get_comments_by_reply_id(1887501, 1, 5).await.unwrap();
+    info!("{:?}",res);
+}   

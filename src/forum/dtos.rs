@@ -113,3 +113,40 @@ pub struct ReportPostDTO{
     pub description:String,
     pub reason_id:String
 }
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GetRepliesVO{
+    pub id:String,
+    pub user:UserFieldInSearchPostItem,
+    pub is_top:bool,
+    pub n_likes:i32,
+    pub is_liked:bool,
+    pub content:String,
+    pub n_comments:i32,
+    pub updated_at:i32,
+    pub created_at:i32,
+    
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EarliestCommentsFieldInGetRepliesVO{
+    pub id:String,
+    pub user:UserFieldInSearchPostItem,
+    pub n_likes:i32,
+    pub is_liked:bool,
+    pub content:String,
+    pub created_at:i32
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GetCommentVO{
+    id:String,
+    user:UserFieldInSearchPostItem,
+    n_likes:i32,
+    is_liked:bool,
+    content:String,
+    created_at:i32,
+    reply_user:Option<ReplyUserFieldInGetCommentVO>
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ReplyUserFieldInGetCommentVO{
+    id:String,
+    nickname:String
+}
