@@ -88,7 +88,20 @@ pub struct PostDetailVO {
     pub is_hotted: bool,
     pub is_pinned: bool,
     pub tutorial_flag: i32,
-    pub ask_help_flag: i32
+    pub ask_help_flag: i32,
+    pub user:UserFieldInPostDetailVO
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct UserFieldInPostDetailVO{
+    pub id:String,
+    pub nickname:String,
+    pub avatar_url:String,
+    pub subject_id:i32,
+    pub work_shop_name:String,
+    pub work_shop_level:i32,
+    pub wuhan_medal:bool,
+    pub has_signed:bool
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostAReplyDTO {
