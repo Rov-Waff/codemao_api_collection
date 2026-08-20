@@ -150,16 +150,16 @@ pub struct EarliestCommentsFieldInGetRepliesVO{
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetCommentVO{
-    id:String,
-    user:UserFieldInSearchPostItem,
-    n_likes:i32,
-    is_liked:bool,
-    content:String,
-    created_at:i32,
-    reply_user:Option<ReplyUserFieldInGetCommentVO>
+    pub id:String,
+    pub user:UserFieldInSearchPostItem,
+    pub n_likes:i32,
+    pub is_liked:bool,
+    pub content:String,
+    pub created_at:i32,
+    pub reply_user:Option<ReplyUserFieldInGetCommentVO>
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ReplyUserFieldInGetCommentVO{
-    id:String,
-    nickname:String
+    pub id:String,
+    pub nickname:String
 }
