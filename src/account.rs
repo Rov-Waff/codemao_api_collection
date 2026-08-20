@@ -1,6 +1,6 @@
-use user_behavior::dtos::AccountLoginVO;
 use reqwest::Client;
 use std::{collections::HashMap, time::Duration};
+use user_behavior::dtos::AccountLoginVO;
 
 use thiserror::Error;
 
@@ -28,6 +28,36 @@ impl Account {
     pub async fn new(username: &str, password: &str) -> Result<Account, Error> {
         let client = Client::builder()
             .timeout(Duration::from_secs(2))
+            .cookie_store(true)
+            .build()?;
+        let mut reqbody = HashMap::new();
+        reqbody.insert("pid", "65edCTyg");
+        reqbody.insert("identity", username);
+        reqbody.insert("password", password);
+        let token = client
+            .post(format!("{}tiger/v3/web/accounts/login", BASE_URL))
+            .json(&reqbody)
+            .send()
+            .await?
+            .json::<AccountLoginVO>()
+            .await?
+            .auth
+            .token;
+
+        Ok(Account {
+            username: username.to_string(),
+            password: password.to_string(),
+            token,
+            client,
+        })
+    }
+    pub async fn new_with_timeout(
+        username: &str,
+        password: &str,
+        timeout: Duration,
+    ) -> Result<Account, Error> {
+        let client = Client::builder()
+            .timeout(timeout)
             .cookie_store(true)
             .build()?;
         let mut reqbody = HashMap::new();
